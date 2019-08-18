@@ -1,9 +1,17 @@
+body {
+    background-image: url(kaabitmap.png);
+    background-repeat: no-repeat;
+    background-position: right top;
+    background-size: 220px;
+}
+
 #program-code {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+    border: 1px solid grey;
 }
 
 #program-output {
@@ -12,4 +20,10 @@
     right: 0;
     bottom: 0;
     left: 0;
+}
+
+.active,
+.btn:hover {
+    background-color: rgb(65, 64, 64);
+    color: white;
 }
