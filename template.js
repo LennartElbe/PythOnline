@@ -6,7 +6,8 @@ function outf(text) {
     //var mypre = document.getElementById("program-output");
     // jQuery('#program-output').html(text);
     //jQuery('#program-output').setValue(text);
-    editor2.setValue(editor2.getValue() + "\n" + text);
+    //editor2.setValue(editor2.getValue() + "\n" + text);
+    editor2.insert(text);
     //mypre.innerHTML = mypre.innerHTML + text;
 }
 
@@ -67,7 +68,8 @@ function serverDoIt() {
     var prog = editor.getValue();
     jQuery.getJSON('computeOnServer.php', { 'code': prog }, function(data) {
         // got a response from the server
-        editor2.setValue(editor2.getValue() + "\n" + data['output']);
+        //editor2.setValue(editor2.getValue() + data['output']);
+        editor2.insert(data['output'] + '\n');
     });
 }
 
@@ -80,31 +82,64 @@ function doIt() {
 }
 
 jQuery(document).ready(function() {
-    console.log("This line is printed after the page is loaded");
+    console.log("This line is printed after the page is loaded.");
     jQuery('#serverside').click(function() {
         server = true;
-        console.log("server is now true")
-            // set the button to blue
+        console.log("server is now true");
+        // set the button to blue
+        jQuery("#dropdownSwitchEngine").children().removeClass('active');
+        jQuery(this).addClass('active');
+        jQuery("#dropdownMenuButton").text('Serverside (Python 3.7.3)');
+        editor2.insert("\n========== Now Interpreting in Python 3.7.3 ==========\n");
     });
-    jQuery('#clientside').click(function() {
+    jQuery('#clientside').on('click', function() {
         server = false;
-        console.log("server is now false")
-            // set button clientside to blue
+        console.log("server is now false");
+        jQuery("#dropdownSwitchEngine").children().removeClass('active');
+        jQuery(this).addClass('active');
+        jQuery("#dropdownMenuButton").text('Clientside (Python 2.7.10)');
+        editor2.insert("\n========== Now Interpreting in Python 2.7.10 ==========\n");
     });
     jQuery('#butt').click(doIt);
     jQuery('#clear').click(clear);
 
+    // fill in the dropdowns
+    //<a class="dropdown-item active" id="clientside" data-toggle="button">Clientside</a>
+    jQuery.getJSON('getScripts.php', function(data) {
+        var ar = [];
+        var paths = [];
+        for (var i = 0; i < data.length; i++) {
+            var text = data[i].split("/");
+            var prog = "Aufgabe: " + text[text.length - 2].replace("sheet", "") + " " + text[text.length - 1].replace(".py", "");
+            ar.push(prog);
+            paths.push(text);
+        }
+        // ar.sort(function(a, b) { return a - b; });
+        for (var i = 0; i < ar.length; i++) {
+            var prog = ar[i];
+            jQuery('#dropdownSwitchCode').append("<a class=\"dropdown-item\" data-toggle=\"button\" value=\"" + paths[i].join("/") + "\"> " + prog + "</a>");
+        }
+    });
+    jQuery('#dropdownSwitchCode').on('click', 'a', function() {
+        console.log("click on item " + jQuery(this).text());
+        var p = jQuery(this).attr('value');
+        jQuery.get(p, function(data) {
+            editor.setValue(data);
+        });
+        jQuery('#sheetsdropdown').text(jQuery(this).text());
+    });
 
     editor = ace.edit("program-code");
     //editor.setTheme("ace/theme/monokai");
     editor.setTheme("ace/theme/github");
     editor.session.setMode("ace/mode/python");
-    editor.setValue("# Add your python code here\n");
-
+    editor.insert("# Add your python code here\n");
 
     editor2 = ace.edit("program-output");
     //editor.setTheme("ace/theme/monokai");
     editor2.setTheme("ace/theme/terminal");
     editor2.session.setMode("ace/mode/curly");
-    editor2.setValue("# The output will appear here\n");
+    editor2.setReadOnly(true);
+    editor2.insert("# The output will appear here.\n");
+    editor2.insert("========== Now Interpreting in Python 2.7.10 ==========\n");
 });
