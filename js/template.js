@@ -66,7 +66,7 @@ function clientDoIt() {
 function serverDoIt() {
     console.log("serverdoit")
     var prog = editor.getValue();
-    jQuery.getJSON('http://localhost:8000/computeOnServer.php', { 'code': prog }, function(data) {
+    jQuery.getJSON('http://localhost:8000/php/computeOnServer.php', { 'code': prog }, function(data) {
         // got a response from the server
         //editor2.setValue(editor2.getValue() + data['output']);
         editor2.insert(data['output'] + '\n');
@@ -105,7 +105,7 @@ jQuery(document).ready(function() {
 
     // fill in the dropdowns
     //<a class="dropdown-item active" id="clientside" data-toggle="button">Clientside</a>
-    jQuery.getJSON('getScripts.php', function(data) {
+    jQuery.getJSON('php/getScripts.php', function(data) {
         var ar = [];
         var paths = [];
         for (var i = 0; i < data.length; i++) {
