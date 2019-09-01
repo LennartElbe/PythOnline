@@ -66,7 +66,7 @@ function clientDoIt() {
 function serverDoIt() {
     console.log("serverdoit")
     var prog = editor.getValue();
-    jQuery.getJSON('computeOnServer.php', { 'code': prog }, function(data) {
+    jQuery.getJSON('http://localhost:8000/computeOnServer.php', { 'code': prog }, function(data) {
         // got a response from the server
         //editor2.setValue(editor2.getValue() + data['output']);
         editor2.insert(data['output'] + '\n');
