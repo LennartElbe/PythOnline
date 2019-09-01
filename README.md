@@ -1,4 +1,6 @@
-## Project to check JavaScript setup of local webpage and examine skulpt's python interpreter.
+## Summary
+The aim of this project is to compare how python scripts are run clientside
+using Skulpt and in a serverside Docker container.
 
 In order to start this project do the following
 ```
@@ -10,7 +12,7 @@ http://localhost:8000
 open
 ```
 
-## How to build the Docker container.
+## How to build the Docker container
 
 In order to build execute the following in bash
 ```
