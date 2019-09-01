@@ -1,3 +1,17 @@
 FROM php:7.3-cli
+#
+# Alternative if server does not provide php. PHP can also be be provided
+# by a docker container. But, we need to rewrite the php files to start
+# python directly. Or - we could allow docker inside docker (more difficult).
+#
 
 RUN apt-get update && apt-get install -y python3.7 && apt-get install -y python3-pip
+
+RUN mkdir /scripts
+COPY php_no_docker/* /scripts/php/
+
+# start the php webserver in /data
+EXPOSE 8000
+
+CMD [ "/bin/bash", "-c", "cd /scripts; php -S localhost:8000" ]
+
