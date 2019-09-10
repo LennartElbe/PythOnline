@@ -5,7 +5,7 @@ RUN apt-get update && \
     apt-get install -y python3.7 && \
     apt-get install -y python3-pip
 
-RUN pip3 install pandas numpy scipy
+RUN pip3 install -U pandas numpy scipy pytest
 
 # Make sure the user inside the docker container is not root
 USER 1000:1000

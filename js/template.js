@@ -70,6 +70,7 @@ function serverDoIt() {
         // got a response from the server
         //editor2.setValue(editor2.getValue() + data['output']);
         editor2.insert(data['output'] + '\n');
+        editor2.insert(data['outputtest'] + '\n');
     });
 }
 

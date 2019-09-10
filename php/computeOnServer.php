@@ -25,18 +25,20 @@ if (isset($_GET['code'])) {
     // for python.
     $text = $_GET['code'];
 }
-file_put_contents($tmpdir . '/code.py', $text);
+file_put_contents($tmpdir . '/test_code.py', $text);
 
 // now run the code locally on a docker images (for example)
 $output = array();
+$outputtest = array();
 
 // custom image
 //$ok = exec( 'docker run --rm -it -v /tmp/:/data python37 /bin/bash -c "/usr/bin/python3.7 /data/code.py"', $output);
 // php image
 // We run a docker per script evaluation and throw away the folder alterwards.
-$ok = exec( 'docker run --rm -it -v '.$tmpdir.':/data phppython37 /bin/bash -c "/usr/bin/python3.7 /data/code.py"', $output);
+$ok = exec( 'docker run --rm -it -v '.$tmpdir.':/data python37test /bin/bash -c "TERM=dumb /usr/local/bin/pytest -v /data/test_code.py"', $outputtest);
+$ok = exec( 'docker run --rm -it -v '.$tmpdir.':/data python37test /bin/bash -c "/usr/bin/python3 /data/test_code.py"', $output);
 
-echo(json_encode(array( "output" => $output )));
+echo(json_encode(array( "output" => $output, "outputtest" => $outputtest )));
 
 // delete the folder again (and all files inside)
 function delTree($dir) { 
