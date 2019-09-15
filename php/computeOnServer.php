@@ -59,6 +59,7 @@ function runDockerWithTimeout($command, $tmpdir, $maxProgramRuntime, &$output) {
         $overTime = ($time_now - $time_start) * 1000; // in ms
         if ($overTime >= $maxProgramRuntime) {
             $debugString[] = "reached timeout";
+            $output[] = "Ilias plugin: python script aborted because runtime exceeded ". $maxProgramRuntime ."ms.";
             break;
         } else {
             $debugString[] = "still running under time";
