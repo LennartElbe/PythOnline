@@ -20,10 +20,10 @@ function tempdir() {
 $tmpdir = tempdir();
 
 $text = "";
-if (isset($_GET['code'])) {
+if (isset($_POST['code'])) {
     // The text from the user is not evaluted, only stored in a text file
     // for python.
-    $text = $_GET['code'];
+    $text = $_POST['code'];
 }
 file_put_contents($tmpdir . '/test_code.py', $text);
 

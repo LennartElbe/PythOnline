@@ -76,7 +76,7 @@ function serverDoIt() {
         data: {
             code: prog
         },
-        // method: "POST",
+        method: "POST",
         success: function(data) {
             console.log(data); // server response
             editor2.insert(data['output'].join("\n") + '\n');
