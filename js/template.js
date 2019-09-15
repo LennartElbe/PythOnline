@@ -66,12 +66,30 @@ function clientDoIt() {
 function serverDoIt() {
     console.log("serverdoit")
     var prog = editor.getValue();
-    jQuery.getJSON('http://localhost:8000/php/computeOnServer.php', { 'code': prog }, function(data) {
-        // got a response from the server
-        //editor2.setValue(editor2.getValue() + data['output']);
-        editor2.insert(data['output'] + '\n');
-        editor2.insert(data['outputtest'] + '\n');
+
+    // do we need to sanitize prog? we could use URL encode/URL decode might 
+    // not be necessary because transfer is using POST...
+    $.ajax({
+        url: "http://192.52.34.132/computeOnServer.php?callback=cb&code=print(42)",
+        jsonp: "callback",
+        dataType: "jsonp",
+        data: {
+            code: prog
+        },
+        // method: "POST",
+        success: function(data) {
+            console.log(data); // server response
+            editor2.insert(data['output'].join("\n") + '\n');
+            editor2.insert(data['outputtest'].join("\n") + '\n');
+        }
     });
+
+    // jQuery.getJSON('http://localhost:8000/php/computeOnServer.php', { 'code': prog }, function(data) {
+    //    // got a response from the server
+    //    //editor2.setValue(editor2.getValue() + data['output']);
+    //    editor2.insert(data['output'].join("\n") + '\n');
+    //    editor2.insert(data['outputtest'].join("\n") + '\n');
+    //});
 }
 
 function doIt() {
