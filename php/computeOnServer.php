@@ -30,13 +30,62 @@ file_put_contents($tmpdir . '/test_code.py', $text);
 // now run the code locally on a docker images (for example)
 $output = array();
 $outputtest = array();
-
 // custom image
 //$ok = exec( 'docker run --rm -it -v /tmp/:/data python37 /bin/bash -c "/usr/bin/python3.7 /data/code.py"', $output);
 // php image
+
+function runDockerWithTimeout($command, $tmpdir, $maxProgramRuntime, &$output) {
+    // replaces execs from below with timeout using docker log background
+    // stop, rm
+    $out = array();
+    $ok = exec('docker run -t -d -v '.$tmpdir.':/data python37test /bin/bash -c "'.$command.'"', $out);
+    $dockerID = $out[0];
+    $dockerIDShort = substr($dockerID, 0, 7);
+    $time_start = microtime(TRUE);
+    $debugString = array();
+    $debugString[] = 'docker run -t -d -v '.$tmpdir.':/data python37test /bin/bash -c "'.$command.'"';
+    while(TRUE) {
+        usleep(500*1000); // 500 ms wait between every check of exit
+        $out2 = array();
+        $ok2 = exec('docker ps -a|grep "'.$dockerIDShort.'"|grep "Exited"', $out2);
+        if($ok2) {
+            $debugString[] = 'docker has exited with id: '. $dockerIDShort .' docker ps -a|grep "'.$dockerIDShort.'"|grep "Exited" applepies'. implode("\n", $out);
+            break;
+        } else {
+            $debugString[] = "docker still running";
+        }
+        // test if script is done
+        $time_now = microtime(TRUE);
+        $overTime = ($time_now - $time_start) * 1000; // in ms
+        if ($overTime >= $maxProgramRuntime) {
+            $debugString[] = "reached timeout";
+            break;
+        } else {
+            $debugString[] = "still running under time";
+        }
+    }
+    $ok3 = exec('docker logs '.$dockerIDShort, $output);
+    $debugString[] = 'docker logs '.$dockerIDShort .'--'. $ok3 .'--'. $command .'--';
+    if ($ok3) {
+        $output[] = "error: array for docker logs";
+    }
+    //$output = array_merge($debugString, $output);
+    //cleanup docker container
+    $ok4 = exec('docker stop '. $dockerIDShort .'; docker rm '. $dockerIDShort);
+    // to do: run docker stop and docker rm in background using /bin/bash -c &
+}
+
+// in ms
+$maxProgramRuntime = 5000;
 // We run a docker per script evaluation and throw away the folder alterwards.
-$ok = exec( 'docker run --rm -it -v '.$tmpdir.':/data python37test /bin/bash -c "TERM=dumb /usr/local/bin/pytest -v /data/test_code.py"', $outputtest);
-$ok = exec( 'docker run --rm -it -v '.$tmpdir.':/data python37test /bin/bash -c "/usr/bin/python3 /data/test_code.py"', $output);
+$command = "TERM=dumb /usr/local/bin/pytest -v /data/test_code.py";
+$ok = runDockerWithTimeout($command, $tmpdir, $maxProgramRuntime, $outputtest);
+
+$command = "/usr/bin/python3 /data/test_code.py";
+$ok = runDockerWithTimeout($command, $tmpdir, $maxProgramRuntime, $output);
+
+// $ok = exec( 'docker run --rm -it -v '.$tmpdir.':/data python37test /bin/bash -c "TERM=dumb /usr/local/bin/pytest -v /data/test_code.py"', $outputtest);
+// $ok = exec( 'docker run --rm -it -v '.$tmpdir.':/data python37test /bin/bash -c "/usr/bin/python3 /data/test_code.py"', $output);
 
 echo(json_encode(array( "output" => $output, "outputtest" => $outputtest )));
 
@@ -50,6 +99,6 @@ function delTree($dir) {
 }
 
 // only delete the temporary directory (server script, should be secure)
-delTree($tmpdir);
+// delTree($tmpdir);
 
 ?>
