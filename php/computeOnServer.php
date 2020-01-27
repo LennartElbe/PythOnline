@@ -79,14 +79,11 @@ function runDockerWithTimeout($command, $tmpdir, $maxProgramRuntime, &$output) {
 // in ms
 $maxProgramRuntime = 5000;
 // We run a docker per script evaluation and throw away the folder alterwards.
-$command = "TERM=dumb /usr/local/bin/pytest -v /data/test_code.py";
-$ok = runDockerWithTimeout($command, $tmpdir, $maxProgramRuntime, $outputtest);
+// $command = "TERM=dumb /usr/local/bin/pytest -v /data/test_code.py"; 
+// $ok = runDockerWithTimeout($command, $tmpdir, $maxProgramRuntime, $outputtest);
 
 $command = "/usr/bin/python3 /data/test_code.py";
 $ok = runDockerWithTimeout($command, $tmpdir, $maxProgramRuntime, $output);
-
-// $ok = exec( 'docker run --rm -it -v '.$tmpdir.':/data python37test /bin/bash -c "TERM=dumb /usr/local/bin/pytest -v /data/test_code.py"', $outputtest);
-// $ok = exec( 'docker run --rm -it -v '.$tmpdir.':/data python37test /bin/bash -c "/usr/bin/python3 /data/test_code.py"', $output);
 
 echo(json_encode(array( "output" => $output, "outputtest" => $outputtest )));
 
