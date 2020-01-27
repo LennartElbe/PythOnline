@@ -106,12 +106,14 @@ function doIt() {
 
 jQuery(document).ready(function() {
     console.log("This line is printed after the page is loaded.");
+
     jQuery('#serverside').click(function() {
         server = true;
         console.log("server is now true");
+
         // set the button to blue
         jQuery("#dropdownSwitchEngine").children().removeClass('active');
-        jQuery(this).addClass('active');
+        bn jQuery(this).addClass('active');
         jQuery("#dropdownMenuButton").text('Serverside (Python 3.7.3)');
         editor2.insert("\n========== Now Interpreting in Python 3.7.3 ==========\n");
     });
